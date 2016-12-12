@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VERTICAL_CAROUSAL</title>
+    <link rel="stylesheet" href="css/vertical_carousal.min.css">
+    <style>
+        html, body, #myVerticalCarousel {
+            height: 100%;
+            margin: 0;
+        }
+
+        .item {
+            text-align: center;
+        }
+
+        #a {
+            background: blue;
+        }
+
+        #b {
+            background: gray;
+        }
+
+        #c {
+            background: red;
+        }
+
+        #d {
+            background: black;
+        }
+
+        p, span {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        span {
+            height: 100%;
+        }
+
+        p {
+            color: #fff;
+            font-size: 3em;
+        }
+    </style>
+</head>
+<body>
+<div id="myVerticalCarousel" class="vertical-carousel" data-url-lock="false"
+     data-rests-indicators="#navbar-collapse li">
+    <ol class="vertical-carousel-indicators hidden-xs">
+        <li data-target="#myVerticalCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myVerticalCarousel" data-slide-to="1"></li>
+        <li data-target="#myVerticalCarousel" data-slide-to="2"></li>
+        <li data-target="#myVerticalCarousel" data-slide-to="3"></li>
+    </ol>
+    <div class="vertical-carousel-box">
+        <div id="a" class="item active">
+            <span></span>
+            <p>First page</p>
+        </div>
+        <div id="b" class="item">
+            <span></span>
+            <p>Second page</p>
+        </div>
+        <div id="c" class="item">
+            <span></span>
+            <p>Thirdly page</p>
+        </div>
+        <div id="d" class="item">
+            <span></span>
+            <p>Fourthly page</p>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+<script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="js/vertical_carousal.min.js"></script>
+<script src="../touch_event/js/touch_event.min.js"></script>
+<script>
+    //touch事件
+    $(window).on("load", function () {
+        var $vertical = $("#myVerticalCarousel");
+        $(document)
+            .on("touch.kp.top", function () {
+                $vertical.vertical_carousel("prev");
+            })
+            .on("touch.kp.down", function () {
+                $vertical.vertical_carousel('next');
+            });
+    })
+</script>
+</html>

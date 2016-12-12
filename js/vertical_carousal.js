@@ -3,7 +3,7 @@
  */
 
 /* ========================================================================
- * Bootstrap: vertical_carousel.js v1.0.0
+ * Bootstrap: vertical_carousel.js v1.1.0
  * ========================================================================
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
@@ -19,11 +19,15 @@
         this.$indicators = this.$element.find('.vertical-carousel-indicators');
         this.$box = this.$element.find(".vertical-carousel-box");
         this.options = options;
+        this.activeIndex = this.getItemIndex(this.$element.find('.item.active'));
         this.sliding = null;
         this.$items = null;
 
         this.options.mousewheel && $(this.options.wheelTarget)
             .on('mousewheel.bs.vertical_carousel', $.proxy(this.mousewheel, this));
+        if (options.urlLock) {
+            this.toURL();
+        }
     };
 
     Carousel.VERSION = "1.0.0";
@@ -32,21 +36,21 @@
 
     Carousel.DEFAULTS = {
         mousewheel: true,
-        wheelTarget: document
+        wheelTarget: document,
+        urlLock: true
     };
 
     Carousel.prototype.mousewheel = function (e) {
         if (this.sliding) {
             return;
         }
-        var activeIndex = this.getItemIndex(this.$element.find('.item.active'));
 
         switch (e.originalEvent.wheelDelta > 0) {
             case true:
-                this.to(activeIndex - 1);
+                this.to(this.activeIndex - 1);
                 break;
             case false:
-                this.to(activeIndex + 1);
+                this.to(this.activeIndex + 1);
                 break;
             default:
                 return
@@ -59,9 +63,20 @@
         return this.$items.index(item)
     };
 
-    Carousel.prototype.to = function (pos) {
-        var that = this;
+    Carousel.prototype.toActive = function () {
+        this.$box.css({
+            transform: "translateY(-" + this.$element.height() * this.activeIndex + "px)"
+        })
+    };
 
+    Carousel.prototype.toURL = function () {
+        var $item = this.$box.find("#" + window.location.href.split("#")[1]);
+        if ($item.length === 1) {
+            this.to(this.getItemIndex($item));
+        }
+    };
+
+    Carousel.prototype.to = function (pos) {
         if (!this.$items) {
             this.$items = this.$box.children('.item');
         }
@@ -70,12 +85,6 @@
             return;
         }
 
-        // if (this.sliding) {
-        //     return this.$element.one('slid.bs.verticalCarousel', function () {
-        //         that.to(pos)
-        //     }); // yes, "slid"
-        // }
-
         return this.slide(pos, this.$items.eq(pos))
     };
 
@@ -83,14 +92,14 @@
         if (this.sliding) {
             return;
         }
-        return this.to(this.getItemIndex(this.$element.find('.item.active')) + 1);
+        return this.to(this.activeIndex + 1);
     };
 
     Carousel.prototype.prev = function () {
         if (this.sliding) {
             return;
         }
-        return this.to(this.getItemIndex(this.$element.find('.item.active')) - 1);
+        return this.to(this.activeIndex - 1);
     };
 
     Carousel.prototype.slide = function (pos, next) {
@@ -112,6 +121,8 @@
 
         this.sliding = true;
 
+        this.activeIndex = pos;
+
         if (this.$indicators.length) {
             this.$indicators.find('.active').removeClass('active');
             var $nextIndicator = $(this.$indicators.children()[pos]);
@@ -126,28 +137,36 @@
         var slidEvent = $.Event('slid.bs.verticalCarousel', {
             relatedTarget: relatedTarget,
             pos: pos
-        }); // yes, "slid"
-        this.$box.css({
-            transform: "translateY(-" + this.$element.attr("data-item-height") * pos + "px)"
         });
-        if ($.support.transition && this.$element.hasClass('slide')) {
+        this.$box.css({
+            transform: "translateY(-" + this.$element.height() * pos + "px)"
+        });
+        if ($.support.transition) {
+            $next[0].offsetWidth;//不理解，有了它可以改善刷新时跳转错误的问题，求大神解答
             $next.addClass("active");
             $active
                 .one('bsTransitionEnd', function () {
                     $active.removeClass('active');
                     that.sliding = false;
-                    location.hash = "#" + $next.prop("id");
+                    if (that.options.urlLock) {
+                        location.hash = "#" + $next.prop("id");
+                    }
                     setTimeout(function () {
                         that.$element.trigger(slidEvent)
                     }, 0)
                 })
                 .emulateTransitionEnd(Carousel.TRANSITION_DURATION);
         } else {
-            $active.removeClass('active');
-            $next.addClass('active');
-            this.sliding = false;
-            location.hash = "#" + $next.prop("id");
-            this.$element.trigger(slidEvent)
+            setTimeout(
+                function () {
+                    $active.removeClass('active');
+                    $next.addClass('active');
+                    that.sliding = false;
+                    if (that.options.urlLock) {
+                        location.hash = "#" + $next.prop("id");
+                    }
+                    that.$element.trigger(slidEvent)
+                }, 100)
         }
 
         return this
@@ -204,8 +223,13 @@
     };
 
     $(document)
-        .on('click.bs.carousel.data-api', '[data-slide-to]', clickHandler);
+        .on('click.bs.vertical_carousel.data-api', '[data-slide-to]', clickHandler);
 
+    $(window).on("resize.bs.vertical_carousel", function () {   //窗口尺寸变化修正
+        $('.vertical-carousel').each(function () {
+            $(this).vertical_carousel("toActive");
+        })
+    });
 
     $(window).on('load', function () {
         $('.vertical-carousel').each(function () {
