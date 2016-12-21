@@ -22,10 +22,18 @@
         this.sliding = null;
         this.$items = null;
 
+        var that = this;
+
         this.options.mousewheel && $(this.options.wheelTarget)
             .on('mousewheel.bs.vertical_carousel', $.proxy(this.mousewheel, this));
         if (options.urlLock) {
             this.toURL();
+            $(window).on("hashchange", function () {
+                setTimeout(function () {
+                    if (!that.sliding)
+                        that.toURL();
+                }, 10)
+            })
         }
     };
 
