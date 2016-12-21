@@ -3,9 +3,7 @@
  */
 
 /* ========================================================================
- * Bootstrap: vertical_carousel.js v1.1.0
- * ========================================================================
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Bootstrap: vertical_carousel.js v1.2.0
  * ======================================================================== */
 
 +function ($) {
@@ -16,6 +14,7 @@
 
     var Carousel = function (element, options) {
         this.$element = $(element);
+        this.id = $(element).prop("id");
         this.$indicators = this.$element.find('.vertical-carousel-indicators');
         this.$box = this.$element.find(".vertical-carousel-box");
         this.options = options;
@@ -30,7 +29,7 @@
         }
     };
 
-    Carousel.VERSION = "1.0.0";
+    Carousel.VERSION = "1.2.0";
 
     Carousel.TRANSITION_DURATION = 600;
 
@@ -70,7 +69,8 @@
     };
 
     Carousel.prototype.toURL = function () {
-        var $item = this.$box.find("#" + window.location.href.split("#")[1]);
+        var hash = location.hash;
+        var $item = this.$box.find(hash.replace(this.id + '_', ''));
         if ($item.length === 1) {
             this.to(this.getItemIndex($item));
         }
@@ -142,14 +142,14 @@
             transform: "translateY(-" + this.$element.height() * pos + "px)"
         });
         if ($.support.transition) {
-            $next[0].offsetWidth;//不理解，有了它可以改善刷新时跳转错误的问题，求大神解答
+            $next[0].offsetWidth;//不理解有什么用，求大神解答
             $next.addClass("active");
             $active
                 .one('bsTransitionEnd', function () {
                     $active.removeClass('active');
                     that.sliding = false;
                     if (that.options.urlLock) {
-                        location.hash = "#" + $next.prop("id");
+                        location.hash = that.id + '_' + $next.prop("id");
                     }
                     setTimeout(function () {
                         that.$element.trigger(slidEvent)
@@ -163,7 +163,7 @@
                     $next.addClass('active');
                     that.sliding = false;
                     if (that.options.urlLock) {
-                        location.hash = "#" + $next.prop("id");
+                        location.hash = that.id + '_' + $next.prop("id");
                     }
                     that.$element.trigger(slidEvent)
                 }, 100)
