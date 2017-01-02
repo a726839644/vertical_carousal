@@ -127,8 +127,6 @@
             return;
         }
 
-
-
         this.sliding = true;
 
         this.activeIndex = pos;
@@ -226,7 +224,7 @@
         Plugin.call($target, options);
 
         if (slideIndex) {
-            $target.data('bs.vertical_carousel').to(slideIndex)
+            $target.data('bs.vertical_carousel').to(parseInt(slideIndex))
         }
 
         e.preventDefault()
