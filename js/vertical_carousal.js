@@ -127,6 +127,8 @@
             return;
         }
 
+
+
         this.sliding = true;
 
         this.activeIndex = pos;
@@ -150,7 +152,7 @@
             transform: "translateY(-" + this.$element.height() * pos + "px)"
         });
         if ($.support.transition) {
-            $next[0].offsetWidth;//不理解有什么用，求大神解答
+            //$next[0].offsetWidth;//不理解有什么用，求大神解答
             $next.addClass("active");
             $active
                 .one('bsTransitionEnd', function () {
