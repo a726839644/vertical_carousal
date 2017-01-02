@@ -200,7 +200,7 @@
 
     $.fn.vertical_carousel = Plugin;
     $.fn.vertical_carousel.Constructor = Carousel;
-
+    
 
     // CAROUSEL NO CONFLICT
     // ====================
